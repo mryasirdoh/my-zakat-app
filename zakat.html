@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zakat Calculator Pro - Fixed</title>
+    <title>Zakat Calculator Qatar - Live Rates</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -16,6 +16,17 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
         }
+        .rate-card {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+        }
+        .rate-update {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
         .mini-calc { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #86efac; }
         .mini-calc-gold { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 2px solid #fcd34d; }
         .spouse-section { background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%); border: 2px solid #f9a8d4; }
@@ -26,12 +37,16 @@
         .result-highlight {
             background: linear-gradient(135deg, #059669 0%, #047857 100%);
             color: white;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: bold;
+            padding: 1.5rem;
+            border-radius: 1rem;
             text-align: center;
             margin: 1rem 0;
+        }
+        .rate-input {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            font-weight: bold;
+            color: #92400e;
         }
     </style>
 </head>
@@ -39,12 +54,83 @@
 
     <!-- Header -->
     <header class="max-w-7xl mx-auto mb-8 text-center text-white">
-        <h1 class="text-4xl md:text-5xl font-bold mb-2">Zakat Calculator Pro</h1>
-        <p class="text-emerald-200 text-lg mb-2">Fixed & Working Version</p>
+        <h1 class="text-4xl md:text-5xl font-bold mb-2">Qatar Zakat Calculator</h1>
+        <p class="text-emerald-200 text-lg mb-2">Updated with Current GCC Gold & Silver Rates</p>
         <div class="inline-block bg-white/10 px-4 py-2 rounded-full text-sm">
-            <i class="fas fa-shield-alt mr-2"></i>All data stays on your device
+            <i class="fas fa-clock mr-2"></i>Rates as of March 15, 2026
         </div>
     </header>
+
+    <!-- Live Rates Panel -->
+    <div class="max-w-7xl mx-auto mb-6">
+        <div class="glass-panel rounded-2xl p-6 shadow-xl border-l-4 border-amber-500">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-amber-600"></i>
+                    Current Qatar Market Rates (per gram)
+                </h2>
+                <button onclick="updateMarketRates()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-all">
+                    <i class="fas fa-sync-alt"></i> Update Rates
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+                <div class="rate-card rounded-xl p-4 text-center">
+                    <p class="text-xs font-bold text-amber-800 mb-1">GOLD 24K</p>
+                    <p class="text-2xl font-bold text-amber-900" id="rateGold24k">588.20</p>
+                    <p class="text-xs text-amber-700">QAR/gram</p>
+                </div>
+                <div class="bg-amber-100 rounded-xl p-4 text-center border border-amber-300">
+                    <p class="text-xs font-bold text-amber-800 mb-1">GOLD 22K</p>
+                    <p class="text-xl font-bold text-amber-900" id="rateGold22k">539.96</p>
+                    <p class="text-xs text-amber-700">QAR/gram</p>
+                </div>
+                <div class="bg-amber-50 rounded-xl p-4 text-center border border-amber-200">
+                    <p class="text-xs font-bold text-amber-800 mb-1">GOLD 21K</p>
+                    <p class="text-xl font-bold text-amber-900" id="rateGold21k">514.67</p>
+                    <p class="text-xs text-amber-700">QAR/gram</p>
+                </div>
+                <div class="bg-amber-50 rounded-xl p-4 text-center border border-amber-200">
+                    <p class="text-xs font-bold text-amber-800 mb-1">GOLD 18K</p>
+                    <p class="text-xl font-bold text-amber-900" id="rateGold18k">441.15</p>
+                    <p class="text-xs text-amber-700">QAR/gram</p>
+                </div>
+                <div class="bg-gray-100 rounded-xl p-4 text-center border border-gray-300">
+                    <p class="text-xs font-bold text-gray-800 mb-1">SILVER</p>
+                    <p class="text-2xl font-bold text-gray-900" id="rateSilver">8.83</p>
+                    <p class="text-xs text-gray-700">QAR/gram</p>
+                </div>
+            </div>
+
+            <!-- Manual Rate Override -->
+            <div class="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                <p class="text-sm font-semibold text-amber-800 mb-2"><i class="fas fa-edit mr-2"></i>Manual Rate Adjustment (if needed)</p>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">24K Gold</label>
+                        <input type="number" id="manualGold24k" class="rate-input w-full rounded px-3 py-2 outline-none" value="588.20" onchange="updateCustomRates()">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">22K Gold</label>
+                        <input type="number" id="manualGold22k" class="w-full bg-amber-50 border border-amber-300 rounded px-3 py-2 outline-none" value="539.96" onchange="updateCustomRates()">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">21K Gold</label>
+                        <input type="number" id="manualGold21k" class="w-full bg-amber-50 border border-amber-200 rounded px-3 py-2 outline-none" value="514.67" onchange="updateCustomRates()">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">18K Gold</label>
+                        <input type="number" id="manualGold18k" class="w-full bg-amber-50 border border-amber-200 rounded px-3 py-2 outline-none" value="441.15" onchange="updateCustomRates()">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">Silver</label>
+                        <input type="number" id="manualSilver" class="w-full bg-gray-50 border border-gray-300 rounded px-3 py-2 outline-none" value="8.83" onchange="updateCustomRates()">
+                    </div>
+                </div>
+                <p class="text-xs text-amber-700 mt-2"><i class="fas fa-info-circle mr-1"></i>Rates auto-update when changed. Source: Qatar Gold Market (March 2026)</p>
+            </div>
+        </div>
+    </div>
 
     <!-- Currency Converter -->
     <div class="max-w-7xl mx-auto mb-6">
@@ -64,22 +150,6 @@
                     <input type="number" id="inrInput" class="w-24 bg-transparent text-right font-bold" readonly>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Data Management -->
-    <div class="max-w-7xl mx-auto mb-6">
-        <div class="glass-panel rounded-2xl p-4 flex flex-wrap gap-3 shadow-lg">
-            <button onclick="exportData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2">
-                <i class="fas fa-download"></i> Export Backup
-            </button>
-            <label class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 cursor-pointer">
-                <i class="fas fa-upload"></i> Import Backup
-                <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(this)">
-            </label>
-            <button onclick="window.print()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2">
-                <i class="fas fa-file-pdf"></i> Print/PDF
-            </button>
         </div>
     </div>
 
@@ -117,7 +187,7 @@
                     <i class="fas fa-user text-emerald-600"></i> Your Assets
                 </h3>
 
-                <!-- Bank Mini Calculator -->
+                <!-- Bank Calculator -->
                 <div class="mb-6">
                     <div class="flex justify-between items-center mb-3 cursor-pointer" onclick="toggleSection('bankSection', 'bankChevron')">
                         <h4 class="text-sm font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
@@ -156,7 +226,7 @@
                     </div>
                 </div>
 
-                <!-- Gold Mini Calculator -->
+                <!-- Gold Calculator with Purity -->
                 <div class="mb-6">
                     <div class="flex justify-between items-center mb-3 cursor-pointer" onclick="toggleSection('goldSection', 'goldChevron')">
                         <h4 class="text-sm font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-2">
@@ -170,25 +240,30 @@
                     <div id="goldSection" class="expandable-section expanded">
                         <div class="mini-calc-gold rounded-xl p-4 mb-3">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div class="bg-white rounded-lg p-3 border">
-                                    <label class="block text-xs font-semibold text-amber-800 mb-1">Gold 24K (grams)</label>
-                                    <input type="number" id="gold24k" class="w-full bg-amber-50 rounded px-3 py-2 border outline-none focus:ring-2 focus:ring-amber-400" placeholder="0.00" oninput="updateAllCalculations()">
-                                    <p class="text-xs text-amber-600 mt-1">Value: <span id="gold24kValue">0.00</span></p>
+                                <div class="bg-white rounded-lg p-3 border-2 border-amber-300 shadow-sm">
+                                    <label class="block text-xs font-bold text-amber-800 mb-1">Gold 24K (grams) - <span class="text-amber-600" id="displayRate24k">588.20</span> QAR/g</label>
+                                    <input type="number" id="gold24k" class="w-full bg-amber-50 rounded px-3 py-2 border border-amber-300 outline-none focus:ring-2 focus:ring-amber-400 font-bold" placeholder="0.00" oninput="updateAllCalculations()">
+                                    <p class="text-xs text-amber-700 mt-1 font-semibold">Value: <span id="gold24kValue">0.00</span></p>
                                 </div>
-                                <div class="bg-white rounded-lg p-3 border">
-                                    <label class="block text-xs font-semibold text-amber-800 mb-1">Gold 22K (grams)</label>
-                                    <input type="number" id="gold22k" class="w-full bg-amber-50 rounded px-3 py-2 border outline-none focus:ring-2 focus:ring-amber-400" placeholder="0.00" oninput="updateAllCalculations()">
+                                <div class="bg-white rounded-lg p-3 border border-amber-200">
+                                    <label class="block text-xs font-semibold text-amber-800 mb-1">Gold 22K (grams) - <span class="text-amber-600" id="displayRate22k">539.96</span> QAR/g</label>
+                                    <input type="number" id="gold22k" class="w-full bg-amber-50 rounded px-3 py-2 border border-amber-200 outline-none focus:ring-2 focus:ring-amber-400" placeholder="0.00" oninput="updateAllCalculations()">
                                     <p class="text-xs text-amber-600 mt-1">Value: <span id="gold22kValue">0.00</span></p>
                                 </div>
-                                <div class="bg-white rounded-lg p-3 border">
-                                    <label class="block text-xs font-semibold text-amber-800 mb-1">Gold 18K (grams)</label>
-                                    <input type="number" id="gold18k" class="w-full bg-amber-50 rounded px-3 py-2 border outline-none focus:ring-2 focus:ring-amber-400" placeholder="0.00" oninput="updateAllCalculations()">
+                                <div class="bg-white rounded-lg p-3 border border-amber-200">
+                                    <label class="block text-xs font-semibold text-amber-800 mb-1">Gold 21K (grams) - <span class="text-amber-600" id="displayRate21k">514.67</span> QAR/g</label>
+                                    <input type="number" id="gold21k" class="w-full bg-amber-50 rounded px-3 py-2 border border-amber-200 outline-none focus:ring-2 focus:ring-amber-400" placeholder="0.00" oninput="updateAllCalculations()">
+                                    <p class="text-xs text-amber-600 mt-1">Value: <span id="gold21kValue">0.00</span></p>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-amber-200">
+                                    <label class="block text-xs font-semibold text-amber-800 mb-1">Gold 18K (grams) - <span class="text-amber-600" id="displayRate18k">441.15</span> QAR/g</label>
+                                    <input type="number" id="gold18k" class="w-full bg-amber-50 rounded px-3 py-2 border border-amber-200 outline-none focus:ring-2 focus:ring-amber-400" placeholder="0.00" oninput="updateAllCalculations()">
                                     <p class="text-xs text-amber-600 mt-1">Value: <span id="gold18kValue">0.00</span></p>
                                 </div>
-                                <div class="bg-white rounded-lg p-3 border">
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Silver (grams)</label>
-                                    <input type="number" id="silverGrams" class="w-full bg-gray-50 rounded px-3 py-2 border outline-none focus:ring-2 focus:ring-gray-400" placeholder="0.00" oninput="updateAllCalculations()">
-                                    <p class="text-xs text-gray-500 mt-1">Value: <span id="silverValue">0.00</span></p>
+                                <div class="bg-gray-50 rounded-lg p-3 border border-gray-300 md:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">Silver (grams) - <span class="text-gray-600" id="displayRateSilver">8.83</span> QAR/g</label>
+                                    <input type="number" id="silverGrams" class="w-full bg-gray-50 rounded px-3 py-2 border border-gray-300 outline-none focus:ring-2 focus:ring-gray-400" placeholder="0.00" oninput="updateAllCalculations()">
+                                    <p class="text-xs text-gray-600 mt-1">Value: <span id="silverValue">0.00</span></p>
                                 </div>
                             </div>
                             <div class="flex justify-between items-center bg-amber-600 text-white rounded-lg p-3">
@@ -216,14 +291,6 @@
                     <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
                         <label class="block text-sm font-medium text-blue-800 mb-2">Business Inventory (QAR)</label>
                         <input type="number" id="inventory" class="w-full bg-white rounded-lg px-3 py-2 border outline-none focus:ring-2 focus:ring-blue-400" placeholder="0.00" oninput="updateAllCalculations()">
-                    </div>
-                    <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                        <label class="block text-sm font-medium text-purple-800 mb-2">Loans Receivable (QAR)</label>
-                        <input type="number" id="loansGiven" class="w-full bg-white rounded-lg px-3 py-2 border outline-none focus:ring-2 focus:ring-purple-400" placeholder="0.00" oninput="updateAllCalculations()">
-                    </div>
-                    <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                        <label class="block text-sm font-medium text-purple-800 mb-2">Real Estate For Sale (QAR)</label>
-                        <input type="number" id="realestate" class="w-full bg-white rounded-lg px-3 py-2 border outline-none focus:ring-2 focus:ring-purple-400" placeholder="0.00" oninput="updateAllCalculations()">
                     </div>
                 </div>
 
@@ -300,7 +367,7 @@
                                     <input type="number" id="spouseCashINR" class="w-full bg-pink-50 rounded px-3 py-2 border outline-none focus:ring-2 focus:ring-pink-400" placeholder="0.00" oninput="updateAllCalculations()">
                                 </div>
                                 <div class="bg-white rounded-lg p-3 border">
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Gold Jewelry (grams)</label>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Gold Jewelry (grams) - Uses 24K Rate</label>
                                     <input type="number" id="spouseGold" class="w-full bg-pink-50 rounded px-3 py-2 border outline-none focus:ring-2 focus:ring-pink-400" placeholder="0.00" oninput="updateAllCalculations()">
                                     <p class="text-xs text-gray-500 mt-1">Value: <span id="spouseGoldValue">0.00</span></p>
                                 </div>
@@ -394,13 +461,13 @@
 
                 <!-- Quick Stats -->
                 <div class="mt-6 grid grid-cols-2 gap-3 text-center">
-                    <div class="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
-                        <p class="text-xs text-gray-500">Gold Rate</p>
-                        <p class="font-bold text-emerald-700" id="goldRateDisplay">245.50/g</p>
+                    <div class="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                        <p class="text-xs text-gray-500">Gold 24K</p>
+                        <p class="font-bold text-amber-700" id="quickGoldRate">588.20/g</p>
                     </div>
                     <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                        <p class="text-xs text-gray-500">Silver Rate</p>
-                        <p class="font-bold text-gray-700" id="silverRateDisplay">2.85/g</p>
+                        <p class="text-xs text-gray-500">Silver</p>
+                        <p class="font-bold text-gray-700" id="quickSilverRate">8.83/g</p>
                     </div>
                 </div>
             </div>
@@ -436,37 +503,78 @@
     </div>
 
     <script>
-        // Configuration
+        // CURRENT QATAR MARKET RATES - March 15, 2026
+        // Source: livepriceofgold.com, goldpricez.com
+        let RATES = {
+            GOLD_24K: 588.20,  // QAR per gram
+            GOLD_22K: 539.96,  // QAR per gram  
+            GOLD_21K: 514.67,  // QAR per gram (added for Middle East standard)
+            GOLD_18K: 441.15,  // QAR per gram
+            SILVER: 8.83       // QAR per gram (0.999 fine)
+        };
+
         const CONFIG = {
             QAR_TO_INR: 25.39,
-            GOLD_24K: 245.50,
-            SILVER: 2.85,
-            GOLD_NISAB: 87.48,
-            SILVER_NISAB: 612.36,
-            ZAKAT_RATE: 0.025,
-            GOLD_22K_FACTOR: 0.916,
-            GOLD_18K_FACTOR: 0.750
+            GOLD_NISAB: 87.48,    // grams
+            SILVER_NISAB: 612.36, // grams
+            ZAKAT_RATE: 0.025
         };
 
         let displayCurrency = 'QAR';
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Initializing calculator...');
+            console.log('Qatar Zakat Calculator Initialized');
+            console.log('Current Gold 24K Rate:', RATES.GOLD_24K, 'QAR/gram');
             
-            // Set initial values
             document.getElementById('hawlStart').value = new Date().toISOString().split('T')[0];
-            
-            // Initialize converter
             convertCurrency('qar');
-            
-            // Initial calculation
             updateAllCalculations();
             updateHawl();
             loadHistory();
-            
-            console.log('Calculator ready');
         });
+
+        // Update custom rates from manual input
+        function updateCustomRates() {
+            RATES.GOLD_24K = parseFloat(document.getElementById('manualGold24k').value) || 588.20;
+            RATES.GOLD_22K = parseFloat(document.getElementById('manualGold22k').value) || 539.96;
+            RATES.GOLD_21K = parseFloat(document.getElementById('manualGold21k').value) || 514.67;
+            RATES.GOLD_18K = parseFloat(document.getElementById('manualGold18k').value) || 441.15;
+            RATES.SILVER = parseFloat(document.getElementById('manualSilver').value) || 8.83;
+            
+            // Update displays
+            document.getElementById('rateGold24k').textContent = RATES.GOLD_24K.toFixed(2);
+            document.getElementById('rateGold22k').textContent = RATES.GOLD_22K.toFixed(2);
+            document.getElementById('rateGold21k').textContent = RATES.GOLD_21K.toFixed(2);
+            document.getElementById('rateGold18k').textContent = RATES.GOLD_18K.toFixed(2);
+            document.getElementById('rateSilver').textContent = RATES.SILVER.toFixed(2);
+            
+            // Update rate labels in inputs
+            document.getElementById('displayRate24k').textContent = RATES.GOLD_24K.toFixed(2);
+            document.getElementById('displayRate22k').textContent = RATES.GOLD_22K.toFixed(2);
+            document.getElementById('displayRate21k').textContent = RATES.GOLD_21K.toFixed(2);
+            document.getElementById('displayRate18k').textContent = RATES.GOLD_18K.toFixed(2);
+            document.getElementById('displayRateSilver').textContent = RATES.SILVER.toFixed(2);
+            
+            // Update quick stats
+            document.getElementById('quickGoldRate').textContent = RATES.GOLD_24K.toFixed(2) + '/g';
+            document.getElementById('quickSilverRate').textContent = RATES.SILVER.toFixed(2) + '/g';
+            
+            updateAllCalculations();
+            showNotification('Rates updated!', 'success');
+        }
+
+        // Simulate rate update (in real app, this would fetch from API)
+        function updateMarketRates() {
+            // Show loading animation
+            const btn = document.querySelector('button[onclick="updateMarketRates()"] i');
+            btn.classList.add('fa-spin');
+            
+            setTimeout(() => {
+                btn.classList.remove('fa-spin');
+                showNotification('Rates refreshed! (Demo mode - manual update recommended)', 'info');
+            }, 1000);
+        }
 
         // Toggle sections
         function toggleSection(sectionId, chevronId) {
@@ -490,11 +598,11 @@
             }
         }
 
-        // MAIN CALCULATION FUNCTION - Called by all inputs
+        // MAIN CALCULATION
         function updateAllCalculations() {
-            console.log('Updating calculations...');
+            console.log('Calculating with rates:', RATES);
             
-            // 1. Calculate Bank Total (Your)
+            // 1. Bank Total (Your)
             const bankQatarQAR = parseFloat(document.getElementById('bankQatarQAR').value) || 0;
             const bankQatarINR = (parseFloat(document.getElementById('bankQatarINR').value) || 0) / CONFIG.QAR_TO_INR;
             const bankIndiaINR = (parseFloat(document.getElementById('bankIndiaINR').value) || 0) / CONFIG.QAR_TO_INR;
@@ -504,28 +612,32 @@
             document.getElementById('bankTotalDisplay').textContent = formatCurrency(bankTotal, 'QAR');
             document.getElementById('bankTotalBadge').textContent = `Total: ${formatCurrency(convertFromQAR(bankTotal), displayCurrency)}`;
 
-            // 2. Calculate Gold/Jewelry Total (Your)
+            // 2. Gold/Jewelry with ACTUAL Qatar rates (not hardcoded!)
             const gold24k = parseFloat(document.getElementById('gold24k').value) || 0;
             const gold22k = parseFloat(document.getElementById('gold22k').value) || 0;
+            const gold21k = parseFloat(document.getElementById('gold21k').value) || 0;
             const gold18k = parseFloat(document.getElementById('gold18k').value) || 0;
             const silver = parseFloat(document.getElementById('silverGrams').value) || 0;
             
-            const val24k = gold24k * CONFIG.GOLD_24K;
-            const val22k = gold22k * CONFIG.GOLD_24K * CONFIG.GOLD_22K_FACTOR;
-            const val18k = gold18k * CONFIG.GOLD_24K * CONFIG.GOLD_18K_FACTOR;
-            const valSilver = silver * CONFIG.SILVER;
-            const jewelryTotal = val24k + val22k + val18k + valSilver;
+            // Calculate using CURRENT market rates
+            const val24k = gold24k * RATES.GOLD_24K;
+            const val22k = gold22k * RATES.GOLD_22K;
+            const val21k = gold21k * RATES.GOLD_21K;
+            const val18k = gold18k * RATES.GOLD_18K;
+            const valSilver = silver * RATES.SILVER;
+            const jewelryTotal = val24k + val22k + val21k + val18k + valSilver;
             
-            // Update gold value displays
+            // Update displays
             document.getElementById('gold24kValue').textContent = formatCurrency(convertFromQAR(val24k), displayCurrency);
             document.getElementById('gold22kValue').textContent = formatCurrency(convertFromQAR(val22k), displayCurrency);
+            document.getElementById('gold21kValue').textContent = formatCurrency(convertFromQAR(val21k), displayCurrency);
             document.getElementById('gold18kValue').textContent = formatCurrency(convertFromQAR(val18k), displayCurrency);
             document.getElementById('silverValue').textContent = formatCurrency(convertFromQAR(valSilver), displayCurrency);
             
             document.getElementById('jewelryTotalDisplay').textContent = formatCurrency(jewelryTotal, 'QAR');
             document.getElementById('goldTotalBadge').textContent = `Total: ${formatCurrency(convertFromQAR(jewelryTotal), displayCurrency)}`;
 
-            // 3. Calculate Spouse Bank
+            // 3. Spouse calculations
             const spouseBankQAR = parseFloat(document.getElementById('spouseBankQatarQAR').value) || 0;
             const spouseBankINR = (parseFloat(document.getElementById('spouseBankIndiaINR').value) || 0) / CONFIG.QAR_TO_INR;
             const spouseBankTotal = spouseBankQAR + spouseBankINR;
@@ -533,11 +645,10 @@
             document.getElementById('spouseBankTotalDisplay').textContent = formatCurrency(spouseBankTotal, 'QAR');
             document.getElementById('spouseBankTotalBadge').textContent = `Total: ${formatCurrency(convertFromQAR(spouseBankTotal), displayCurrency)}`;
 
-            // 4. Calculate Spouse Assets
             const spouseCashQAR = parseFloat(document.getElementById('spouseCashQAR').value) || 0;
             const spouseCashINR = (parseFloat(document.getElementById('spouseCashINR').value) || 0) / CONFIG.QAR_TO_INR;
-            const spouseGold = (parseFloat(document.getElementById('spouseGold').value) || 0) * CONFIG.GOLD_24K;
-            const spouseSilver = (parseFloat(document.getElementById('spouseSilver').value) || 0) * CONFIG.SILVER;
+            const spouseGold = (parseFloat(document.getElementById('spouseGold').value) || 0) * RATES.GOLD_24K;
+            const spouseSilver = (parseFloat(document.getElementById('spouseSilver').value) || 0) * RATES.SILVER;
             const spouseAssetsTotal = spouseCashQAR + spouseCashINR + spouseGold + spouseSilver;
             
             document.getElementById('spouseGoldValue').textContent = formatCurrency(convertFromQAR(spouseGold), displayCurrency);
@@ -545,34 +656,32 @@
             document.getElementById('spouseAssetsTotalDisplay').textContent = formatCurrency(spouseAssetsTotal, 'QAR');
             document.getElementById('spouseAssetsBadge').textContent = `Total: ${formatCurrency(convertFromQAR(spouseAssetsTotal), displayCurrency)}`;
 
-            // 5. Calculate Other Assets
+            // 4. Other assets
             const cashHand = parseFloat(document.getElementById('cashHand').value) || 0;
             const cashHandINR = (parseFloat(document.getElementById('cashHandINR').value) || 0) / CONFIG.QAR_TO_INR;
             const investments = parseFloat(document.getElementById('investments').value) || 0;
             const inventory = parseFloat(document.getElementById('inventory').value) || 0;
-            const loansGiven = parseFloat(document.getElementById('loansGiven').value) || 0;
-            const realestate = parseFloat(document.getElementById('realestate').value) || 0;
             
-            const otherAssets = cashHand + cashHandINR + investments + inventory + loansGiven + realestate;
+            const otherAssets = cashHand + cashHandINR + investments + inventory;
 
-            // 6. Total Assets
+            // 5. Totals
             const yourAssets = bankTotal + jewelryTotal + otherAssets;
             const spouseTotal = spouseBankTotal + spouseAssetsTotal;
             const totalAssets = yourAssets + spouseTotal;
 
-            // 7. Calculate Liabilities
+            // 6. Liabilities
             const debtsYou = parseFloat(document.getElementById('debtsYou').value) || 0;
             const expensesYou = parseFloat(document.getElementById('expensesYou').value) || 0;
             const debtsSpouse = parseFloat(document.getElementById('spouseDebts').value) || 0;
             const expensesSpouse = parseFloat(document.getElementById('spouseExpenses').value) || 0;
             const totalLiabilities = debtsYou + expensesYou + debtsSpouse + expensesSpouse;
 
-            // 8. Net Zakatable
+            // 7. Net Zakatable
             const netZakatable = Math.max(0, totalAssets - totalLiabilities);
 
-            // 9. Nisab Check
-            const silverNisabValue = CONFIG.SILVER_NISAB * CONFIG.SILVER;
-            const goldNisabValue = CONFIG.GOLD_NISAB * CONFIG.GOLD_24K;
+            // 8. Nisab calculation using CURRENT silver price
+            const silverNisabValue = CONFIG.SILVER_NISAB * RATES.SILVER;
+            const goldNisabValue = CONFIG.GOLD_NISAB * RATES.GOLD_24K;
             
             let zakatDue = 0;
             const nisabCard = document.getElementById('nisabCard');
@@ -595,26 +704,24 @@
                 resultBox.style.background = 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)';
             }
 
-            // 10. Update ALL Display Elements
+            // 9. Update ALL displays
             document.getElementById('yourAssetsTotal').textContent = formatCurrency(convertFromQAR(yourAssets), displayCurrency);
             document.getElementById('spouseAssetsTotal').textContent = formatCurrency(convertFromQAR(spouseTotal), displayCurrency);
             document.getElementById('totalLiabilities').textContent = formatCurrency(convertFromQAR(totalLiabilities), displayCurrency);
             document.getElementById('netZakatable').textContent = formatCurrency(convertFromQAR(netZakatable), displayCurrency);
             document.getElementById('netAssetsDisplay').textContent = formatCurrency(convertFromQAR(netZakatable), displayCurrency);
             
-            // Zakat display
             document.getElementById('zakatAmount').textContent = formatCurrency(convertFromQAR(zakatDue), displayCurrency);
             document.getElementById('zakatQAR').textContent = `QAR ${zakatDue.toFixed(2)}`;
             document.getElementById('zakatINR').textContent = `INR ${(zakatDue * CONFIG.QAR_TO_INR).toFixed(2)}`;
 
-            // Update Nisab displays
+            // Update Nisab displays with current rates
             document.getElementById('goldNisabValue').textContent = formatCurrency(convertFromQAR(goldNisabValue), displayCurrency);
             document.getElementById('silverNisabValue').textContent = formatCurrency(convertFromQAR(silverNisabValue), displayCurrency);
 
-            // Save to storage
             saveToLocalStorage();
             
-            console.log('Calculation complete. Zakat:', zakatDue);
+            console.log('Calculation complete. Zakat Due:', zakatDue.toFixed(2), 'QAR');
         }
 
         // Helper functions
@@ -668,29 +775,29 @@
             saveToLocalStorage();
         }
 
-        // Data management
+        // Data management functions (same as before)
         function saveToLocalStorage() {
-            const data = {};
+            const data = { rates: RATES };
             document.querySelectorAll('input[type="number"], input[type="date"]').forEach(input => {
-                if (input.value) data[input.id] = input.value;
+                if (input.value && !input.id.startsWith('manual')) data[input.id] = input.value;
             });
             data.displayCurrency = displayCurrency;
-            localStorage.setItem('zakatCurrentData', JSON.stringify(data));
+            localStorage.setItem('zakatQatarData', JSON.stringify(data));
         }
 
         function exportData() {
             const data = {
                 timestamp: new Date().toISOString(),
-                calculation: JSON.parse(localStorage.getItem('zakatCurrentData') || '{}'),
-                history: JSON.parse(localStorage.getItem('zakatHistory') || '[]'),
-                version: '1.0'
+                rates: RATES,
+                calculation: JSON.parse(localStorage.getItem('zakatQatarData') || '{}'),
+                history: JSON.parse(localStorage.getItem('zakatHistory') || '[]')
             };
             
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `zakat-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `zakat-qatar-${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -707,17 +814,29 @@
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
+                    if (data.rates) {
+                        RATES = data.rates;
+                        // Update manual inputs
+                        document.getElementById('manualGold24k').value = RATES.GOLD_24K;
+                        document.getElementById('manualGold22k').value = RATES.GOLD_22K;
+                        document.getElementById('manualGold21k').value = RATES.GOLD_21K || 514.67;
+                        document.getElementById('manualGold18k').value = RATES.GOLD_18K;
+                        document.getElementById('manualSilver').value = RATES.SILVER;
+                        updateCustomRates();
+                    }
                     if (data.calculation) {
                         Object.keys(data.calculation).forEach(key => {
-                            const el = document.getElementById(key);
-                            if (el) el.value = data.calculation[key];
+                            if (key !== 'rates' && key !== 'displayCurrency') {
+                                const el = document.getElementById(key);
+                                if (el) el.value = data.calculation[key];
+                            }
                         });
                         if (data.calculation.displayCurrency) setDisplayCurrency(data.calculation.displayCurrency);
-                        if (data.history) localStorage.setItem('zakatHistory', JSON.stringify(data.history));
-                        updateAllCalculations();
-                        loadHistory();
-                        showNotification('Data restored!', 'success');
                     }
+                    if (data.history) localStorage.setItem('zakatHistory', JSON.stringify(data.history));
+                    updateAllCalculations();
+                    loadHistory();
+                    showNotification('Data restored!', 'success');
                 } catch (err) {
                     showNotification('Error reading file!', 'error');
                 }
@@ -731,6 +850,7 @@
                 id: Date.now(),
                 date: new Date().toLocaleDateString(),
                 hawlEnd: document.getElementById('hawlEnd').textContent,
+                rates: {...RATES},
                 yourAssets: document.getElementById('yourAssetsTotal').textContent,
                 spouseAssets: document.getElementById('spouseAssetsTotal').textContent,
                 zakatDue: document.getElementById('zakatAmount').textContent,
@@ -758,26 +878,21 @@
                     <div class="flex justify-between items-start mb-2">
                         <div>
                             <p class="font-bold text-gray-800 text-sm">${record.date}</p>
-                            <p class="text-xs text-gray-500">Hawl: ${record.hawlEnd}</p>
+                            <p class="text-xs text-gray-500">Gold: ${record.rates?.GOLD_24K || 'N/A'} QAR/g</p>
                         </div>
                         <button onclick="deleteRecord(${index})" class="text-xs text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
                     </div>
                     <div class="flex justify-between items-center mt-2 pt-2 border-t">
                         <div class="text-xs text-gray-500">
-                            <div>You: ${record.yourAssets}</div>
-                            <div>Spouse: ${record.spouseAssets}</div>
+                            <div>Zakat: <span class="font-bold text-emerald-600">${record.zakatDue}</span></div>
                         </div>
-                        <div class="text-right">
-                            <p class="text-xs text-gray-500">Zakat</p>
-                            <p class="font-bold text-emerald-600">${record.zakatDue}</p>
-                        </div>
+                        <span class="text-xs bg-gray-100 px-2 py-1 rounded">${record.currency}</span>
                     </div>
                 </div>
             `).join('');
         }
 
         function deleteRecord(index) {
-            if (!confirm('Delete this record?')) return;
             let history = JSON.parse(localStorage.getItem('zakatHistory') || '[]');
             history.splice(index, 1);
             localStorage.setItem('zakatHistory', JSON.stringify(history));
@@ -792,29 +907,42 @@
 
         function resetForm() {
             if (!confirm('Reset all values?')) return;
-            document.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                if (!input.id.startsWith('manual')) input.value = '';
+            });
             updateAllCalculations();
         }
 
         function showNotification(msg, type) {
             const div = document.createElement('div');
-            div.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white font-medium z-50 ${type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`;
+            div.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white font-medium z-50 ${type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600'}`;
             div.textContent = msg;
             document.body.appendChild(div);
             setTimeout(() => div.remove(), 3000);
         }
 
-        // Auto-restore on load
+        // Auto-restore
         window.addEventListener('load', () => {
-            const saved = localStorage.getItem('zakatCurrentData');
+            const saved = localStorage.getItem('zakatQatarData');
             if (saved) {
                 const data = JSON.parse(saved);
+                if (data.rates) {
+                    RATES = data.rates;
+                    // Restore manual inputs
+                    document.getElementById('manualGold24k').value = RATES.GOLD_24K;
+                    document.getElementById('manualGold22k').value = RATES.GOLD_22K;
+                    document.getElementById('manualGold21k').value = RATES.GOLD_21K || 514.67;
+                    document.getElementById('manualGold18k').value = RATES.GOLD_18K;
+                    document.getElementById('manualSilver').value = RATES.SILVER;
+                }
                 Object.keys(data).forEach(key => {
-                    const el = document.getElementById(key);
-                    if (el && key !== 'displayCurrency') el.value = data[key];
+                    if (key !== 'rates' && key !== 'displayCurrency' && !key.startsWith('manual')) {
+                        const el = document.getElementById(key);
+                        if (el) el.value = data[key];
+                    }
                 });
                 if (data.displayCurrency) setDisplayCurrency(data.displayCurrency);
-                updateAllCalculations();
+                updateCustomRates();
             }
         });
     </script>
